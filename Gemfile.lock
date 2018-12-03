@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sample_data_dump_postgres_data_store (0.0.1)
+    sample_data_dump_postgres_data_store (0.0.2)
       activerecord
       dry-matcher
       dry-monads
@@ -10,7 +10,7 @@ PATH
       duckface-interfaces
       pg
       railties
-      sample_data_dump
+      sample_data_dump (>= 0.0.2)
 
 GEM
   remote: https://rubygems.org/
