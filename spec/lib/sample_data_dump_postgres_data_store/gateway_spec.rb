@@ -224,7 +224,7 @@ module SampleDataDumpPostgresDataStore
 
       before do
         sql = 'SELECT EXISTS ( ' \
-              "SELECT * FROM pg_catalog.pg_namespace WHERE nspname = 'my_schema_name' );"
+              "  SELECT *   FROM pg_catalog.pg_namespace   WHERE nspname = 'my_schema_name' );"
         expect(postgresql_adapter)
           .to receive(:execute).with(sql).and_return([{ 'exists' => schema_exists }])
       end
@@ -236,9 +236,9 @@ module SampleDataDumpPostgresDataStore
         let(:table_exists) { false }
 
         before do
-          sql = 'SELECT EXISTS ( ' \
-                'SELECT 1 FROM information_schema.tables ' \
-                "WHERE table_schema = 'my_schema_name' AND table_name = 'my_table_name' );"
+          sql = 'SELECT EXISTS (   ' \
+                'SELECT 1   FROM   information_schema.tables   ' \
+                "WHERE  table_schema = 'my_schema_name'   AND    table_name = 'my_table_name' );"
           expect(postgresql_adapter)
             .to receive(:execute).with(sql).and_return([{ 'exists' => table_exists }])
         end

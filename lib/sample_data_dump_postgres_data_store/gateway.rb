@@ -68,7 +68,7 @@ module SampleDataDumpPostgresDataStore
       end
 
       def run(sql)
-        @postgresql_adapter.execute sql.squish
+        @postgresql_adapter.execute sql.tr("\n", ' ').strip
       end
     end
 
