@@ -12,7 +12,7 @@ module SampleDataDumpPostgresDataStore
     implements_interface SampleDataDump::Interfaces::DataStoreGateway
 
     def initialize(postgresql_adapter, settings)
-      @squished_sql_runner = SquishedSqlRunner.new(postgresql_adapter)
+      @postgresql_adapter = postgresql_adapter
       @settings = settings
     end
 
@@ -21,7 +21,7 @@ module SampleDataDumpPostgresDataStore
       uncompressed_file_path = dump_file.local_dump_file_path
 
       sql = extraction_sql(table_configuration)
-      results = @squished_sql_runner.run(sql)
+      results = @postgresql_adapter.execute(sql)
       export_results_to_sql(results, table_configuration, uncompressed_file_path)
       Dry::Monads::Success(uncompressed_file_path)
     end
@@ -36,24 +36,24 @@ module SampleDataDumpPostgresDataStore
       end
 
       sql = File.read(source_file_path)
-      @squished_sql_runner.run(sql)
+      @postgresql_adapter.execute(sql)
       Dry::Monads::Success(true)
     end
 
     def reset_sequence(table_configuration)
       table_name = table_configuration.qualified_table_name
       sql = "SELECT setval('#{table_name}_id_seq', coalesce((SELECT MAX(id) FROM #{table_name}),1))"
-      @squished_sql_runner.run(sql)
+      @postgresql_adapter.execute(sql)
       Dry::Monads::Success(true)
     end
 
     def valid?(table_configuration)
-      TableConfigurationValidator.new(table_configuration, @squished_sql_runner).validation_result
+      TableConfigurationValidator.new(table_configuration, @postgresql_adapter).validation_result
     end
 
     def wipe_table(table_configuration)
       qualified_table_name = table_configuration.qualified_table_name
-      @squished_sql_runner.run "DELETE FROM #{qualified_table_name} CASCADE"
+      @postgresql_adapter.execute "DELETE FROM #{qualified_table_name} CASCADE"
       Dry::Monads::Success(true)
     end
 
@@ -62,22 +62,12 @@ module SampleDataDumpPostgresDataStore
     attr_reader :settings
     delegate :compacted_dump_directory, :lorem_ipsum_function_schema, to: :settings
 
-    class SquishedSqlRunner
-      def initialize(postgresql_adapter)
-        @postgresql_adapter = postgresql_adapter
-      end
-
-      def run(sql)
-        @postgresql_adapter.execute sql.tr("\n", ' ').strip
-      end
-    end
-
     class TableConfigurationValidator
       include Dry::Monads::Do.for(:validation_result)
 
-      def initialize(table_configuration, squished_sql_runner)
+      def initialize(table_configuration, postgresql_adapter)
         @table_configuration = table_configuration
-        @squished_sql_runner = squished_sql_runner
+        @postgresql_adapter = postgresql_adapter
       end
 
       def validation_result
@@ -106,7 +96,7 @@ module SampleDataDumpPostgresDataStore
             WHERE nspname = '#{schema_name}'
           );
         SQL
-        results = @squished_sql_runner.run(sql)
+        results = @postgresql_adapter.execute(sql)
 
         return Dry::Monads::Success(true) if results.first['exists']
 
@@ -122,7 +112,7 @@ module SampleDataDumpPostgresDataStore
             AND    table_name = '#{table_name}'
           );
         SQL
-        results = @squished_sql_runner.run(sql)
+        results = @postgresql_adapter.execute(sql)
 
         return Dry::Monads::Success(true) if results.first['exists']
 
@@ -135,7 +125,7 @@ module SampleDataDumpPostgresDataStore
           WHERE #{dump_where}
           LIMIT 1
         SQL
-        @squished_sql_runner.run(sql)
+        @postgresql_adapter.execute(sql)
         Dry::Monads::Success(true)
       rescue ActiveRecord::StatementInvalid
         Dry::Monads::Failure("dump_where for #{qualified_table_name} invalid")
@@ -146,7 +136,7 @@ module SampleDataDumpPostgresDataStore
         return success_result if obfuscate_columns.empty?
 
         sql = "SELECT #{obfuscate_columns.join(', ')} FROM #{qualified_table_name} LIMIT 1"
-        @squished_sql_runner.run(sql)
+        @postgresql_adapter.execute(sql)
         success_result
       rescue ActiveRecord::StatementInvalid
         Dry::Monads::Failure("obfuscate_columns for #{qualified_table_name} invalid")
@@ -174,7 +164,7 @@ module SampleDataDumpPostgresDataStore
         WHERE table_schema = '#{table_configuration.schema_name}'
         AND table_name = '#{table_configuration.table_name}'
       SQL
-      @squished_sql_runner.run(sql).map { |row| row['column_name'] }
+      @postgresql_adapter.execute(sql).map { |row| row['column_name'] }
     end
 
     def lorem_ipsum_columns(table_configuration)

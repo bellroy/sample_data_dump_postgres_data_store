@@ -39,19 +39,19 @@ module SampleDataDumpPostgresDataStore
     let(:obfuscate_columns) { %w[contact_given_name] }
 
     let(:expect_column_retrieval) do
-      sql = 'SELECT column_name FROM information_schema.columns ' \
-            "WHERE table_schema = 'my_schema_name' AND table_name = 'my_table_name'"
+      sql = "SELECT column_name FROM information_schema.columns\n" \
+            "WHERE table_schema = 'my_schema_name'\nAND table_name = 'my_table_name'\n"
       expect(postgresql_adapter).to receive(:execute).with(sql)
     end
     let(:expect_data_retrieval_with_obfuscated_column) do
-      data_sql = 'SELECT app_internals.lorem_ipsum(3) AS "contact_given_name" ' \
-                 'FROM my_schema_name.my_table_name WHERE column_name = 123 LIMIT 100000'
+      data_sql = "SELECT app_internals.lorem_ipsum(3) AS \"contact_given_name\"\n" \
+                 "FROM my_schema_name.my_table_name\nWHERE column_name = 123\nLIMIT 100000\n"
       expect(postgresql_adapter).to receive(:execute).with(data_sql)
     end
     let(:expect_data_load_with_string) do
-      insert_sql = 'DELETE FROM my_schema_name.my_table_name; ' \
-                   'INSERT INTO my_schema_name.my_table_name ("contact_given_name") ' \
-                   'VALUES (\'lorem\')'
+      insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
+                   "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+                   "VALUES\n('lorem')\n"
       expect(postgresql_adapter).to receive(:execute).with(insert_sql)
     end
 
@@ -91,8 +91,8 @@ module SampleDataDumpPostgresDataStore
           expect(data_result)
             .to receive(:each_with_index).and_yield({ 'contact_given_name' => 1 }, 0)
 
-          data_sql = 'SELECT "contact_given_name" ' \
-                     'FROM my_schema_name.my_table_name WHERE column_name = 123 LIMIT 100000'
+          data_sql = "SELECT \"contact_given_name\"\n" \
+                     "FROM my_schema_name.my_table_name\nWHERE column_name = 123\nLIMIT 100000\n"
           expect(postgresql_adapter).to receive(:execute).with(data_sql).and_return(data_result)
         end
 
@@ -102,9 +102,9 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = 'DELETE FROM my_schema_name.my_table_name; ' \
-                       'INSERT INTO my_schema_name.my_table_name ("contact_given_name") ' \
-                       'VALUES (1)'
+          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
+                       "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+                       "VALUES\n(1)\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)
         end
@@ -119,8 +119,8 @@ module SampleDataDumpPostgresDataStore
           expect(data_result)
             .to receive(:each_with_index).and_yield({ 'current_user' => 'bob' }, 0)
 
-          data_sql = 'SELECT "user" ' \
-                     'FROM my_schema_name.my_table_name WHERE column_name = 123 LIMIT 100000'
+          data_sql = "SELECT \"user\"\n" \
+                     "FROM my_schema_name.my_table_name\nWHERE column_name = 123\nLIMIT 100000\n"
           expect(postgresql_adapter).to receive(:execute).with(data_sql).and_return(data_result)
         end
 
@@ -130,9 +130,9 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = 'DELETE FROM my_schema_name.my_table_name; ' \
-                       'INSERT INTO my_schema_name.my_table_name ("user") ' \
-                       'VALUES (\'bob\')'
+          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
+                       "INSERT INTO my_schema_name.my_table_name (\"user\")\n" \
+                       "VALUES\n('bob')\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)
         end
@@ -147,8 +147,8 @@ module SampleDataDumpPostgresDataStore
           expect(data_result)
             .to receive(:each_with_index).and_yield({ 'contact_given_name' => nil }, 0)
 
-          data_sql = 'SELECT "contact_given_name" ' \
-                     'FROM my_schema_name.my_table_name WHERE column_name = 123 LIMIT 100000'
+          data_sql = "SELECT \"contact_given_name\"\n" \
+                     "FROM my_schema_name.my_table_name\nWHERE column_name = 123\nLIMIT 100000\n"
           expect(postgresql_adapter).to receive(:execute).with(data_sql).and_return(data_result)
         end
 
@@ -158,9 +158,9 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = 'DELETE FROM my_schema_name.my_table_name; ' \
-                       'INSERT INTO my_schema_name.my_table_name ("contact_given_name") ' \
-                       'VALUES (NULL)'
+          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
+                       "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+                       "VALUES\n(NULL)\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)
         end
@@ -179,7 +179,7 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          expect(postgresql_adapter).to receive(:execute).with("SELECT 'No rows to load'")
+          expect(postgresql_adapter).to receive(:execute).with("SELECT 'No rows to load'\n")
           gateway.load_dump_file(table_configuration)
         end
       end
@@ -223,8 +223,8 @@ module SampleDataDumpPostgresDataStore
       let(:schema_exists) { false }
 
       before do
-        sql = 'SELECT EXISTS ( ' \
-              "  SELECT *   FROM pg_catalog.pg_namespace   WHERE nspname = 'my_schema_name' );"
+        sql = "SELECT EXISTS (\n  " \
+              "SELECT *\n  FROM pg_catalog.pg_namespace\n  WHERE nspname = 'my_schema_name'\n);\n"
         expect(postgresql_adapter)
           .to receive(:execute).with(sql).and_return([{ 'exists' => schema_exists }])
       end
@@ -236,9 +236,10 @@ module SampleDataDumpPostgresDataStore
         let(:table_exists) { false }
 
         before do
-          sql = 'SELECT EXISTS (   ' \
-                'SELECT 1   FROM   information_schema.tables   ' \
-                "WHERE  table_schema = 'my_schema_name'   AND    table_name = 'my_table_name' );"
+          sql = "SELECT EXISTS (\n  " \
+                "SELECT 1\n  FROM   information_schema.tables\n  " \
+                "WHERE  table_schema = 'my_schema_name'\n  " \
+                "AND    table_name = 'my_table_name'\n);\n"
           expect(postgresql_adapter)
             .to receive(:execute).with(sql).and_return([{ 'exists' => table_exists }])
         end
@@ -248,7 +249,7 @@ module SampleDataDumpPostgresDataStore
         context 'when table exists' do
           let(:table_exists) { true }
           let(:dump_where_condition) do
-            'SELECT * FROM my_schema_name.my_table_name WHERE column_name = 123 LIMIT 1'
+            "SELECT * FROM my_schema_name.my_table_name\nWHERE column_name = 123\nLIMIT 1\n"
           end
 
           context 'when dump_where condition valid' do
