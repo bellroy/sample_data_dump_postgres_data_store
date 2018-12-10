@@ -304,14 +304,44 @@ module SampleDataDumpPostgresDataStore
     describe '#reset_sequence' do
       subject(:reset_sequence) { gateway.reset_sequence(table_configuration) }
 
-      before do
-        expect(postgresql_adapter)
-          .to receive(:execute)
-          .with("SELECT setval('my_schema_name.my_table_name_id_seq', " \
-                'coalesce((SELECT MAX(id) FROM my_schema_name.my_table_name),1))')
+      context 'when sequence exists' do
+        before do
+          expect(postgresql_adapter)
+            .to receive(:execute)
+            .with("SELECT PG_GET_SERIAL_SEQUENCE('my_schema_name.my_table_name', 'id') AS name")
+            .and_return([{ 'name' => sequence_name }])
+        end
+
+        context 'when is named' do
+          let(:sequence_name) { 'wild_sequence' }
+
+          before do
+            expect(postgresql_adapter)
+              .to receive(:execute)
+              .with("SELECT setval('#{sequence_name}', " \
+                    'coalesce((SELECT MAX(id) FROM my_schema_name.my_table_name),1))')
+          end
+
+          it { is_expected.to be_success }
+        end
+
+        context 'when is unnamed' do
+          let(:sequence_name) { nil }
+
+          it { is_expected.to be_success }
+        end
       end
 
-      it { is_expected.to be_success }
+      context 'when sequence does not exist' do
+        before do
+          expect(postgresql_adapter)
+            .to receive(:execute)
+            .with("SELECT PG_GET_SERIAL_SEQUENCE('my_schema_name.my_table_name', 'id') AS name")
+            .and_raise(ActiveRecord::StatementInvalid)
+        end
+
+        it { is_expected.to be_success }
+      end
     end
   end
 end

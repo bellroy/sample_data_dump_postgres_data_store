@@ -1,3 +1,7 @@
+0.0.4
+
+   * Handle inconsistently named or nonexistent sequences
+
 0.0.3
 
    * Fixed bug where spaces were being stripped out of data

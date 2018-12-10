@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    sample_data_dump_postgres_data_store (0.0.3)
+    sample_data_dump_postgres_data_store (0.0.4)
       activerecord
       dry-matcher
       dry-monads
@@ -156,7 +156,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
-    rake (12.3.1)
+    rake (12.3.2)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -179,7 +179,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
-    rubocop (0.60.0)
+    rubocop (0.61.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)

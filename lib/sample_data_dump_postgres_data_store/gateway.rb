@@ -42,8 +42,14 @@ module SampleDataDumpPostgresDataStore
 
     def reset_sequence(table_configuration)
       table_name = table_configuration.qualified_table_name
-      sql = "SELECT setval('#{table_name}_id_seq', coalesce((SELECT MAX(id) FROM #{table_name}),1))"
-      @postgresql_adapter.execute(sql)
+      get_sequence_name_sql = "SELECT PG_GET_SERIAL_SEQUENCE('#{table_name}', 'id') AS name"
+      sequence_name = @postgresql_adapter.execute(get_sequence_name_sql).first['name']
+      if sequence_name.present?
+        sql = "SELECT setval('#{sequence_name}', coalesce((SELECT MAX(id) FROM #{table_name}),1))"
+        @postgresql_adapter.execute(sql)
+      end
+      Dry::Monads::Success(true)
+    rescue ActiveRecord::StatementInvalid # means sequence or column does not exist
       Dry::Monads::Success(true)
     end
 
