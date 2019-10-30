@@ -36,7 +36,6 @@ module SampleDataDumpPostgresDataStore
       end
 
       sql = File.read(source_file_path)
-      puts "Load data #{source_file_path}"
       @postgresql_adapter.execute(sql)
       Dry::Monads::Success(true)
     end
@@ -60,7 +59,6 @@ module SampleDataDumpPostgresDataStore
 
     def wipe_table(table_configuration)
       qualified_table_name = table_configuration.qualified_table_name
-      puts "Wipe table #{qualified_table_name}"
       @postgresql_adapter.execute "DELETE FROM #{qualified_table_name} CASCADE"
       Dry::Monads::Success(true)
     end
