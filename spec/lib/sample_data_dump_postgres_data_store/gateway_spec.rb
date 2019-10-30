@@ -49,8 +49,7 @@ module SampleDataDumpPostgresDataStore
       expect(postgresql_adapter).to receive(:execute).with(data_sql)
     end
     let(:expect_data_load_with_string) do
-      insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
-                   "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+      insert_sql = "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
                    "VALUES\n('lorem')\n"
       expect(postgresql_adapter).to receive(:execute).with(insert_sql)
     end
@@ -102,8 +101,7 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
-                       "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+          insert_sql = "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
                        "VALUES\n(1)\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)
@@ -130,8 +128,7 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
-                       "INSERT INTO my_schema_name.my_table_name (\"user\")\n" \
+          insert_sql = "INSERT INTO my_schema_name.my_table_name (\"user\")\n" \
                        "VALUES\n('bob')\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)
@@ -158,8 +155,7 @@ module SampleDataDumpPostgresDataStore
           expect(File.exist?(dump_to_local_file.value!)).to be true
           local_file_system_gateway.decompress_compressed_dump_file(table_configuration)
 
-          insert_sql = "DELETE FROM my_schema_name.my_table_name;\n" \
-                       "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
+          insert_sql = "INSERT INTO my_schema_name.my_table_name (\"contact_given_name\")\n" \
                        "VALUES\n(NULL)\n"
           expect(postgresql_adapter).to receive(:execute).with(insert_sql)
           gateway.load_dump_file(table_configuration)

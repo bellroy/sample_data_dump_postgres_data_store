@@ -185,10 +185,10 @@ module SampleDataDumpPostgresDataStore
         `echo "SELECT 'No rows to load'" >> #{sql_file_path}`
       else
         File.open(sql_file_path, 'w+') do |file|
-          table_name = table_configuration.qualified_table_name
-          file.puts "DELETE FROM #{table_name};"
           insert_columns = table_columns(table_configuration)
+          table_name = table_configuration.qualified_table_name
           columns_in_quotes = insert_columns.map { |col| "\"#{col}\"" }.join(', ')
+
           file.puts "INSERT INTO #{table_name} (#{columns_in_quotes})"
           file.puts 'VALUES'
           results.each_with_index do |result, index|
