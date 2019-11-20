@@ -1,3 +1,7 @@
+0.0.5
+
+   * Dependency updates
+
 0.0.4
 
    * Handle inconsistently named or nonexistent sequences
